@@ -1,7 +1,7 @@
 repositories {
     mavenCentral()
     google() // Needed for androidx
-    maven { url = "https://mymaven.bylazer.com/releases" }
+    maven { url = "https://mymaven.bylazar.com/releases" }
 }
 
 dependencies {
@@ -15,12 +15,10 @@ dependencies {
     implementation 'org.firstinspires.ftc:Vision:11.1.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
 
-    // Pedro Pathing
+    // PedroPathing
     implementation 'com.pedropathing:ftc:2.1.2'
-    implementation 'com.pedropathing:telemetry:1.0.1'
-
-    implementation 'com.bylazer:fullpanels:1.0.12'
-
+    implementation 'com.pedropathing:telemetry:1.0.0'
+    implementation 'com.bylazar:fullpanels:1.0.12'
     // Ivy
     implementation 'com.pedropathing:ivy:1.0.0'
 }
