@@ -65,37 +65,9 @@ class shooter(hardwareMap: HardwareMap) {
     }
 
 
-    fun shootSuperShort() {
-        motor.setVelocity(speedSuperShort)
-        if ((motor.velocity) < (speedSuperShort)) {
-//            servo.position = closed
-        } else {
-//            servo.position = open
-        }
-
-    }
-
-    fun shootShort() {
-        motor.setVelocity(speedShort)
-        if ((motor.velocity) < (speedShort)) {
-//            servo.position = closed
-        } else {
-//            servo.position = open
-        }
-    }
-
-    fun shootLong() {
-        motor.setVelocity(speedLong)
-        if ((motor.velocity) < (speedLong)) {
-//            servo.position = closed
-        } else {
-//            servo.position = open
-        }
-    }
-
     fun setPower(RS: Double) {
-        motor.setVelocity(RS)
-        motor2.setVelocity(-RS)
+        motor.velocity = RS
+        motor2.velocity = -RS
 //        if ((motor.velocity) < (RS)) {
 //            servo.position = closed
 //        } else {
@@ -104,8 +76,8 @@ class shooter(hardwareMap: HardwareMap) {
     }
 
     fun stopShoot() {
-        motor.setVelocity(0.0)
-        motor2.setVelocity(0.0)
+        motor.velocity = 0.0
+        motor2.velocity = 0.0
         servo.position = closed
     }
 

@@ -65,7 +65,7 @@ class turret(hardwareMap: HardwareMap) {
         spinMotor.setPositionPIDFCoefficients(P)
         spinMotor.setVelocityPIDFCoefficients(P, I, D, F)
         spinMotor.direction = DcMotorSimple.Direction.FORWARD
-        servo.position = 0.50
+        servo.position = 1.0
     }
 
     fun track(degrees: Double, offset: Double) {
