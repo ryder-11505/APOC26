@@ -15,6 +15,8 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 
 public class Constants {
@@ -34,15 +36,24 @@ public class Constants {
             .useBrakeModeInTeleOp(true)
             .xVelocity(76.82)
             .yVelocity(61.54)
+
+            .leftFrontMotorName("lF")
+            .leftRearMotorName("lR")
+            .rightFrontMotorName("rF")
+            .rightRearMotorName("rR")
+
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
     public static PinpointConstants pinpointConstants = new PinpointConstants()
-            .forwardPodY(-5)
-            .strafePodX(3)
+            .hardwareMapName("pinpoint")
+            .forwardPodY(5.5)
+            .strafePodX(0)
+            .distanceUnit(DistanceUnit.INCH)
+            .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
+            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.95, 100, 1, 1);
 

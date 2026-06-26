@@ -17,24 +17,29 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.max
 
+import com.bylazar.configurables.PanelsConfigurables
+import com.bylazar.configurables.annotations.Configurable
+
 
 class turret(hardwareMap: HardwareMap) {
+    @Configurable
     companion object PARAMS {
 
         @JvmField
-        var ticksPerDegree: Double = 3.5
+        var ticksPerDegree: Double = 8.79083
 
         private const val encoderCPR = 28.0
-        private var gearRatio = (ticksPerDegree * 360.0) / encoderCPR // ≈ 41.2380952381
+        private var gearRatio = (ticksPerDegree * 360.0) / encoderCPR
+        private var GearRatio = 113.025
 
         @JvmField
-        var P = 25.0
+        var P = 5.0
 
         @JvmField
         var I = 0.0
 
         @JvmField
-        var D = 7.0
+        var D = 0.0
 
         @JvmField
         var F = 0.0
@@ -88,8 +93,12 @@ class turret(hardwareMap: HardwareMap) {
     }
 
     fun hoodAngle(angle: Double) {
-        val position = 0.0333333 * angle - 0.333333
+        val position = -0.03125 * angle + 1.9375
         servo.position = position
+    }
+
+    fun servoPos(pos: Double) {
+        servo.position = pos
     }
 
     fun resetEncoder() {
