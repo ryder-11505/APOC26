@@ -9,6 +9,8 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.subsystems.intake;
 import org.firstinspires.ftc.teamcode.subsystems.shooter;
@@ -113,9 +115,9 @@ public class TeleOP extends LinearOpMode {
             follower.update();
 
             follower.setTeleOpDrive(
+                     -gamepad1.left_stick_y,
+                    gamepad1.left_stick_x,
                     gamepad1.right_stick_x,
-                    -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x,
                     true // Robot Centric
             );
 
@@ -141,25 +143,62 @@ public class TeleOP extends LinearOpMode {
 
             double Ar = 0.0549451 * Dr + 28.17582;
 
-            double viB = (Db / Math.cos((90 - Ab))) * Math.sqrt((386.4 / (2 * (Db * Math.tan((90 - Ab)) - 20.75))));
+            double viB = (Db / Math.cos((90 - Ab))) * Math.sqrt((386.4 / (2 * (Db * Math.tan((Math.toRadians(90 - Ab))) - 20.75))));
 
-            double viR = (Dr / Math.cos((90 - Ar))) * Math.sqrt((386.4 / (2 * (Dr * Math.tan((90 - Ar)) - 20.75))));
+            double viR = (Dr / Math.cos((90 - Ar))) * Math.sqrt((386.4 / (2 * (Dr * Math.tan((Math.toRadians(90 - Ar))) - 20.75))));
 
             double rpmB = (120 * viB) / (Math.PI * 2.83465 * 1.2);
 
             double rpmR = (120 * viR) / (Math.PI * 2.83465 * 1.2);
 
 
-            if (gamepad1.b && PoseStorage.isRedAlliance) {
-                outtake.setPower(rpmR);
-                telemetry.addLine("b");
-            } else if (gamepad1.b && !PoseStorage.isRedAlliance) {
-                outtake.setPower(rpmB);
-                telemetry.addLine("b");
+//            if (gamepad1.b && PoseStorage.isRedAlliance) {
+//                outtake.setPower(rpmR);
+//                telemetry.addLine("b");
+//            } else if (gamepad1.b && !PoseStorage.isRedAlliance) {
+//                outtake.setPower(rpmB);
+//                telemetry.addLine("b");
+//            }
+
+
+            double finalTargetRPM = 0.0;
+
+            if (gamepad1.b) {
+                if (PoseStorage.isRedAlliance) {
+                    // If the math defaults to 0 because of a dead zone, fall back to your preset long/short speeds
+                    if (rpmR <= 50.0) {
+                        finalTargetRPM = 990.0; // Your shooter.speedLong default fallback
+                    } else {
+                        finalTargetRPM = rpmR;
+                    }
+                } else {
+                    if (rpmB <= 50.0) {
+                        finalTargetRPM = 990.0; // Fallback
+                    } else {
+                        finalTargetRPM = rpmB;
+                    }
+                }
+
+                // Command the unthrottled target power safely
+                outtake.setPower(finalTargetRPM);
             }
 
             if (gamepad1.bWasReleased()) {
                 outtake.stopShoot();
+            }
+
+            if (PoseStorage.isRedAlliance) {
+                if (rpmR <= 50.0) {
+                    finalTargetRPM = 600.0; // Lower this fallback number if the "dead zone" speed is too intense
+                } else {
+                    finalTargetRPM = rpmR;
+                }
+            } else if (!PoseStorage.isRedAlliance) {
+                if (rpmB <= 50.0) {
+                    finalTargetRPM = 600.0; // Lower this fallback number if the "dead zone" speed is too intense
+                } else {
+                    finalTargetRPM = rpmB;
+                }
             }
 
             if (gamepad1.right_bumper && PoseStorage.isRedAlliance) {
@@ -169,7 +208,7 @@ public class TeleOP extends LinearOpMode {
                     offset -= 2.0;
                 }
                 spinSimple.track(Math.toDegrees(Hr2), offset);
-                spinSimple.hoodAngle(Dr);
+                spinSimple.hoodAngle(Ar);
             } else if (gamepad1.right_bumper && !PoseStorage.isRedAlliance) {
                 if (gamepad1.dpadLeftWasPressed()) {
                     offset += 2.0;
@@ -177,7 +216,7 @@ public class TeleOP extends LinearOpMode {
                     offset -= 2.0;
                 }
                 spinSimple.track(Math.toDegrees(Hb2), offset);
-                spinSimple.hoodAngle(Db);
+                spinSimple.hoodAngle(Ab);
             }
 
             if (gamepad1.rightBumperWasReleased()) {
@@ -294,10 +333,18 @@ public class TeleOP extends LinearOpMode {
 //            Logging.LOG("X coordinate (IN)T", pose.getX(DistanceUnit.INCH));
 //            Logging.LOG("Y coordinate (IN)T", pose.getY(DistanceUnit.INCH));
 //            Logging.LOG("Heading angle (DEGREES)T", pose.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("1. Intended Target RPM", finalTargetRPM);
+            telemetry.addData("2. Left Motor Velocity (outL)", outtake.getMotor().getVelocity());
+            telemetry.addData("3. Right Motor Velocity (outR)", outtake.getMotor2().getVelocity()); // Add getMotor2() helper to shooter.kt
+            telemetry.addData("target speed blue", viB);
+            telemetry.addData("target rpm blue", rpmB);
+            telemetry.addData("target speed red", viR);
+            telemetry.addData("target rpm red", rpmR);
+            telemetry.addData("target servo angle blue", Ab);
+            telemetry.addData("target servo pos blue", -0.03125 * Ab + 1.9375);
+            telemetry.addData("target servo angle red", Ar);
+            telemetry.addData("target servo pos red", -0.03125 * Ar + 1.9375);
             telemetry.addData("servo pos", spinSimple.getServo().getPosition());
-            telemetry.addData("angle", angle);
-            telemetry.addData("timer", transferTimer.timeRemaining(TimeUnit.MILLISECONDS));
-            telemetry.addData("servo angle", spinSimple.getServo().getPosition());
             telemetry.addData("Blue angle (deg)", Math.toDegrees(Hb2));
             telemetry.addData("Red angle (deg)", Math.toDegrees(Hr2));
             telemetry.addData("Blue distance (IN)", Db);

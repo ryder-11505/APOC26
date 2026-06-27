@@ -33,13 +33,13 @@ class turret(hardwareMap: HardwareMap) {
         private var GearRatio = 113.025
 
         @JvmField
-        var P = 5.0
+        var P = 12.0
 
         @JvmField
-        var I = 0.0
+        var I = 2.0
 
         @JvmField
-        var D = 0.0
+        var D = 3.0
 
         @JvmField
         var F = 0.0
@@ -64,7 +64,7 @@ class turret(hardwareMap: HardwareMap) {
         spinMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         spinMotor.setPositionPIDFCoefficients(P)
         spinMotor.setVelocityPIDFCoefficients(P, I, D, F)
-        spinMotor.direction = DcMotorSimple.Direction.FORWARD
+        spinMotor.direction = DcMotorSimple.Direction.REVERSE
         servo.position = 1.0
     }
 

@@ -21,39 +21,40 @@ import com.qualcomm.hardware.dfrobot.HuskyLens;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(10)
-            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.3, 0.1211,0.0017011))
-            .forwardZeroPowerAcceleration(-42.072)
-            .lateralZeroPowerAcceleration(-67.58)
-            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(1, 0, .01, 0))
-            .headingPIDFCoefficients(new PIDFCoefficients(1, 0, 0.01, 0))
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.015,0,0.003,0))
-            .useSecondaryDrivePIDF(true)
-            .useSecondaryHeadingPIDF(true)
-            .useSecondaryTranslationalPIDF(true);
+            .mass(12.5)
+            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.3, 0.1211,0.001701+1))
+            .forwardZeroPowerAcceleration(-60.72825270100406)
+            .lateralZeroPowerAcceleration(-96.6697407470146)
+            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(0, 0, 0, 0))
+            .headingPIDFCoefficients(new PIDFCoefficients(0, 0, 0, 0))
+            .translationalPIDFCoefficients(new PIDFCoefficients(0,0,0,0))
+            .useSecondaryDrivePIDF(false)
+            .useSecondaryHeadingPIDF(false)
+            .useSecondaryTranslationalPIDF(false);
 
     public static MecanumConstants mecanumConstants = new MecanumConstants()
             .useBrakeModeInTeleOp(true)
-            .xVelocity(76.82)
-            .yVelocity(61.54)
+            .xVelocity(63.31940562330832)
+            .yVelocity(54.23424342432423)
 
             .leftFrontMotorName("lF")
             .leftRearMotorName("lR")
             .rightFrontMotorName("rF")
             .rightRearMotorName("rR")
 
-            .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
+
     public static PinpointConstants pinpointConstants = new PinpointConstants()
             .hardwareMapName("pinpoint")
-            .forwardPodY(5.5)
-            .strafePodX(0)
+            .forwardPodY(5.25)
+            .strafePodX(5.25)
             .distanceUnit(DistanceUnit.INCH)
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
+            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.95, 100, 1, 1);
 
