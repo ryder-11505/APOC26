@@ -1,67 +1,55 @@
 package org.firstinspires.ftc.teamcode.subsystems
 
-import androidx.xr.runtime.Config
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver
-import com.qualcomm.hardware.rev.RevColorSensorV3
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.HardwareMap
-import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.qualcomm.robotcore.hardware.Servo
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
-import org.firstinspires.ftc.robotcore.internal.system.Deadline
-import java.util.concurrent.TimeUnit
 import kotlin.math.abs
-import kotlin.math.max
 
-import com.bylazar.configurables.PanelsConfigurables
 import com.bylazar.configurables.annotations.Configurable
 
 
 class turret(hardwareMap: HardwareMap) {
+
     @Configurable
     companion object PARAMS {
 
-        @JvmField
-        var ticksPerDegree: Double = 8.79083
+        @JvmField var ticksPerDegree: Double = 8.79083
 
-        private const val encoderCPR = 28.0
-        private var gearRatio = (ticksPerDegree * 360.0) / encoderCPR
-        private var GearRatio = 113.025
+        @JvmField var P = 12.0
+        @JvmField var I = 2.0
+        @JvmField var D = 3.0
+        @JvmField var F = 0.0
 
-        @JvmField
-        var P = 12.0
+        // Trim added to every turret angle command — positive = clockwise
+        @JvmField var turretTrim: Double = 2.0
 
-        @JvmField
-        var I = 2.0
-
-        @JvmField
-        var D = 3.0
-
-        @JvmField
-        var F = 0.0
+        // Tuned table: (distanceMM, servoPos, shooterRPM)
+        val HOOD_TABLE = listOf(
+            Triple(500.0,  1.0000, 940.0),
+            Triple(1000.0, 0.9400, 980.0),
+            Triple(1500.0, 0.8700, 1140.0),
+            Triple(2000.0, 0.8000, 1240.0),
+            Triple(2500.0, 0.7700, 1290.0),
+            Triple(3000.0, 0.7700, 1390.0),
+        )
     }
 
-    val spinMotor = hardwareMap.get(DcMotorEx::class.java, "spin")
-    val servo = hardwareMap.get(Servo::class.java, "servo2")
+    // Hardware
+    val spinMotor         = hardwareMap.get(DcMotorEx::class.java, "spin")
+    val servo             = hardwareMap.get(Servo::class.java, "servo2")
+
 
     val spinCurrentPosition get() = spinMotor.currentPosition
-    val spinTargetPos get() = spinMotor.targetPosition
+    val spinTargetPos       get() = spinMotor.targetPosition
 
-    private fun initMotor() {
+    init {
         spinMotor.targetPosition = 0
         spinMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
         spinMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         spinMotor.power = 0.1
         spinMotor.targetPositionTolerance = 2
-    }
-
-    init {
-        initMotor()
-        spinMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         spinMotor.setPositionPIDFCoefficients(P)
         spinMotor.setVelocityPIDFCoefficients(P, I, D, F)
         spinMotor.direction = DcMotorSimple.Direction.REVERSE
@@ -69,41 +57,69 @@ class turret(hardwareMap: HardwareMap) {
     }
 
     fun track(degrees: Double, offset: Double) {
-        val degreesWithOffset = degrees + offset
-        var safeDegrees = degreesWithOffset
-        if (degreesWithOffset > 180) {
-            safeDegrees = degreesWithOffset - 360
-        } else if (degreesWithOffset < -180) {
-            safeDegrees = 360 - degreesWithOffset
-        } else if (IntRange(-180, 180).contains(degrees.toInt())) {
-            safeDegrees = degreesWithOffset
+        val degreesWithOffset = degrees + offset + turretTrim
+        val safeDegrees = when {
+            degreesWithOffset >  180 -> degreesWithOffset - 360
+            degreesWithOffset < -180 -> degreesWithOffset + 360
+            else                     -> degreesWithOffset
         }
-        val targetPosition = ((safeDegrees * ticksPerDegree).toInt())
+        val targetPosition = (safeDegrees * ticksPerDegree).toInt()
         spinMotor.targetPosition = targetPosition
         spinMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
         spinMotor.power = 1.0
-        if (abs(((safeDegrees * ticksPerDegree).toInt()) - ((safeDegrees * ticksPerDegree).toInt())) < spinMotor.targetPositionTolerance && abs(((safeDegrees * ticksPerDegree).toInt()) - spinCurrentPosition) < spinMotor.targetPositionTolerance) {
-            spinMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
-            spinMotor.power = 0.0
-        }
-        if (IntRange(-1, 1).contains(((safeDegrees * ticksPerDegree).toInt()) - spinCurrentPosition)){
-            spinMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
-            spinMotor.power = 0.0
-        }
-    }
 
-    fun hoodAngle(angle: Double) {
-        val position = -0.03125 * angle + 1.9375
-        servo.position = position
+        if (abs(targetPosition - spinCurrentPosition) < spinMotor.targetPositionTolerance) {
+            spinMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+            spinMotor.power = 0.0
+        }
     }
 
     fun servoPos(pos: Double) {
         servo.position = pos
     }
 
-    fun resetEncoder() {
-        spinMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+    fun hoodFromDistance(distanceMM: Double): Double {
+        val table = HOOD_TABLE
+        if (distanceMM <= table.first().first) { servo.position = table.first().second; return table.first().second }
+        if (distanceMM >= table.last().first)  { servo.position = table.last().second;  return table.last().second  }
+        val lower = table.last  { it.first <= distanceMM }
+        val upper = table.first { it.first >  distanceMM }
+        val t = (distanceMM - lower.first) / (upper.first - lower.first)
+        val pos = lower.second + t * (upper.second - lower.second)
+        servo.position = pos
+        return pos
     }
 
+    fun rpmFromDistance(distanceMM: Double): Double {
+        val table = HOOD_TABLE
+        val baseRPM = when {
+            distanceMM <= table.first().first -> table.first().third
+            distanceMM >= table.last().first  -> table.last().third
+            else -> {
+                val lower = table.last  { it.first <= distanceMM }
+                val upper = table.first { it.first >  distanceMM }
+                val t = (distanceMM - lower.first) / (upper.first - lower.first)
+                lower.third + t * (upper.third - lower.third)
+            }
+        }
+        return baseRPM
+    }
 
+    /**
+     * Sets hood servo and returns voltage-compensated RPM for the shooter.
+     * Call every loop when shooting:
+     *   val rpm = turret.aimForDistance(distanceMM)
+     *   shooter.setPower(rpm, intakeRunning)
+     */
+    fun aimForDistance(distanceMM: Double): Double {
+        hoodFromDistance(distanceMM)
+        return rpmFromDistance(distanceMM)
+    }
+
+    fun resetEncoder() {
+        spinMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+        spinMotor.targetPosition = 0
+        spinMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+        spinMotor.power = 0.1
+    }
 }
