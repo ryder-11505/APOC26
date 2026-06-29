@@ -18,7 +18,7 @@ import static com.pedropathing.ivy.commands.Commands.*;
 import org.firstinspires.ftc.teamcode.config.pedro.Constants;
 
 @Autonomous(name = "9 ball + gate", group = "Examples")
-public class testA=uto extends LinearOpMode {
+public class testAuto extends LinearOpMode {
 
     private Follower follower;
     private Paths paths;

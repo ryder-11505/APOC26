@@ -33,7 +33,7 @@ public class TeleOP extends LinearOpMode {
     // Depth of the goal, front face to back face (where Dr/Db are measured to).
     // The shooter RPM/hood table was tuned against distance-to-front-face,
     // so this is subtracted before the table lookup.
-    public static double GoalDepthMM = 14.0 * 25.4; // 355.6 mm
+    public static double GoalDepthMM = 19.0 * 25.4; // 355.6 mm
 
     // Turret/shooter launch point offset from robot center of rotation,
     // along the chassis forward axis. Negative = behind center.
