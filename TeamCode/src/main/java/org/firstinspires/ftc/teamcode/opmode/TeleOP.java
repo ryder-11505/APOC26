@@ -30,6 +30,15 @@ public class TeleOP extends LinearOpMode {
     public static double SlowmodeTurning = 0.5;
     public static double TriggerMin      = 0.01;
 
+    // Depth of the goal, front face to back face (where Dr/Db are measured to).
+    // The shooter RPM/hood table was tuned against distance-to-front-face,
+    // so this is subtracted before the table lookup.
+    public static double GoalDepthMM = 14.0 * 25.4; // 355.6 mm
+
+    // Turret/shooter launch point offset from robot center of rotation,
+    // along the chassis forward axis. Negative = behind center.
+    public static double ShooterForwardOffsetInches = -4.3;
+
     public int targetId = 24;
 
     private boolean isScanning = false;
@@ -95,17 +104,30 @@ public class TeleOP extends LinearOpMode {
             double Y = follower.getPose().getY();
             double H = follower.getPose().getHeading();
 
-            // Distance to each goal in inches
-            double Dr = Math.sqrt(((72.0 - Y) * (72.0 - Y)) + ((72.0 + X) * (72.0 + X)));
-            double Db = Math.sqrt(((-72.0 - Y) * (-72.0 - Y)) + ((72.0 + X) * (72.0 + X)));
+            // Actual launch point of the shooter: the turret pivot is fixed
+            // to the chassis ShooterForwardOffsetInches along the forward
+            // axis, so it rotates with chassis heading rather than staying
+            // at the robot's center of rotation.
+            double launchX = X + ShooterForwardOffsetInches * Math.cos(H);
+            double launchY = Y + ShooterForwardOffsetInches * Math.sin(H);
+
+            // Distance to each goal in inches, measured from the actual
+            // launch point rather than the robot's center of rotation.
+            double Dr = Math.sqrt(((72.0 - launchY) * (72.0 - launchY)) + ((72.0 + launchX) * (72.0 + launchX)));
+            double Db = Math.sqrt(((-72.0 - launchY) * (-72.0 - launchY)) + ((72.0 + launchX) * (72.0 + launchX)));
 
             // Turret heading angles
-            double Hr2 = (-H) - Math.acos((72.0 + X) / Dr);
-            double Hb2 = (-H) + Math.acos((72.0 + X) / Db);
+            double Hr2 = (-H) - Math.acos((72.0 + launchX) / Dr);
+            double Hb2 = (-H) + Math.acos((72.0 + launchX) / Db);
 
             // Distance in mm for the tuned lookup table (1 inch = 25.4 mm)
+            // Dr/Db are measured to the back of the goal, but the hood/RPM
+            // table was tuned to the front face, so correct for goal depth
+            // before doing the table lookup.
             double distMM_R = Dr * 25.4;
             double distMM_B = Db * 25.4;
+            double tableDistMM_R = distMM_R - GoalDepthMM;
+            double tableDistMM_B = distMM_B - GoalDepthMM;
 
             double finalTargetRPM = 0.0;
 
@@ -121,7 +143,7 @@ public class TeleOP extends LinearOpMode {
                 if (gamepad1.dpadUpWasPressed()) boost += 0.1;
                 if (gamepad1.dpadUpWasPressed()) boost -= 0.1;
                 spinSimple.track(Math.toDegrees(Hr2), offset);
-                finalTargetRPM = spinSimple.aimForDistance(distMM_R) * boost;
+                finalTargetRPM = spinSimple.aimForDistance(tableDistMM_R) * boost;
                 outtake.setPower(finalTargetRPM, shouldBoost);
 
             } else if (!PoseStorage.isRedAlliance) {
@@ -130,7 +152,7 @@ public class TeleOP extends LinearOpMode {
                 if (gamepad1.dpadUpWasPressed()) boost += 0.1;
                 if (gamepad1.dpadUpWasPressed()) boost -= 0.1;
                 spinSimple.track(Math.toDegrees(Hb2), offset);
-                finalTargetRPM = spinSimple.aimForDistance(distMM_B) * boost;
+                finalTargetRPM = spinSimple.aimForDistance(tableDistMM_B) * boost;
                 outtake.setPower(finalTargetRPM, shouldBoost);
             }
 
@@ -183,6 +205,8 @@ public class TeleOP extends LinearOpMode {
             telemetry.addData("Blue distance (in)",         Db);
             telemetry.addData("Red distance (mm)",          distMM_R);
             telemetry.addData("Blue distance (mm)",         distMM_B);
+            telemetry.addData("Red table dist (mm)",        tableDistMM_R);
+            telemetry.addData("Blue table dist (mm)",       tableDistMM_B);
             telemetry.addData("Servo pos",                  spinSimple.getServo().getPosition());
             telemetry.addData("Red angle (deg)",            Math.toDegrees(Hr2));
             telemetry.addData("Blue angle (deg)",           Math.toDegrees(Hb2));

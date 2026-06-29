@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -9,12 +9,15 @@ import org.firstinspires.ftc.teamcode.subsystems.turret;
 @TeleOp(name = "Hood Tuner", group = "Tuning")
 public class HoodTunerOpMode extends LinearOpMode {
 
-    private final double[] testDistances = {500, 1000, 1500, 2000, 2500, 3000};
+    private final double[] testDistances = {
+            200, 400, 600, 800, 1000, 1200, 1400, 1600,
+            1800, 2000, 2200, 2400, 2600, 2800, 3000
+    };
     private int distanceIndex = 0;
 
-    private final double[] savedServo = new double[6];
-    private final double[] savedRPM   = new double[6];
-    private final boolean[] saved     = new boolean[6];
+    private final double[] savedServo = new double[testDistances.length];
+    private final double[] savedRPM   = new double[testDistances.length];
+    private final boolean[] saved     = new boolean[testDistances.length];
 
     private double servoPos   = 0.5;
     private double shooterRPM = 1300.0;
@@ -38,7 +41,7 @@ public class HoodTunerOpMode extends LinearOpMode {
         shooter shooterSub = new shooter(hardwareMap);
 
         telemetry.addLine("Hood Tuner ready");
-        telemetry.addLine("Place robot at 500mm from target");
+        telemetry.addLine("Place robot at 200mm from target");
         telemetry.addLine("DPAD UP/DOWN   = hood servo");
         telemetry.addLine("DPAD LEFT/RIGHT = shooter RPM");
         telemetry.addLine("LB             = fine adjust");
@@ -60,7 +63,7 @@ public class HoodTunerOpMode extends LinearOpMode {
                 telemetry.addLine("val HOOD_TABLE = listOf(");
                 for (int i = 0; i < testDistances.length; i++) {
                     if (saved[i]) {
-                        telemetry.addLine("    Pair(" + (int)testDistances[i] + ".0, "
+                        telemetry.addLine("    Triple(" + (int) testDistances[i] + ".0, "
                                 + String.format("%.4f", savedServo[i]) + ", "
                                 + savedRPM[i] + "),");
                     }
@@ -129,14 +132,14 @@ public class HoodTunerOpMode extends LinearOpMode {
 
             // Telemetry
             telemetry.addLine("=== HOOD TUNER ===");
-            telemetry.addData("Distance mm",  (int)distance + "  (" + (distanceIndex + 1) + " of " + testDistances.length + ")");
+            telemetry.addData("Distance mm",  (int) distance + "  (" + (distanceIndex + 1) + " of " + testDistances.length + ")");
             telemetry.addData("Hood servo",   String.format("%.4f", servoPos));
             telemetry.addData("Shooter RPM",  shooterRPM);
             telemetry.addData("Fine mode LB", fine);
             telemetry.addLine("--- Saved ---");
             for (int i = 0; i < testDistances.length; i++) {
                 if (saved[i]) {
-                    telemetry.addLine("  " + (int)testDistances[i] + "mm  servo="
+                    telemetry.addLine("  " + (int) testDistances[i] + "mm  servo="
                             + String.format("%.4f", savedServo[i])
                             + "  rpm=" + savedRPM[i]);
                 }
@@ -149,4 +152,3 @@ public class HoodTunerOpMode extends LinearOpMode {
         shooterSub.stopShoot();
     }
 }
-
