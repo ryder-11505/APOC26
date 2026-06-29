@@ -21,21 +21,16 @@ import com.qualcomm.hardware.dfrobot.HuskyLens;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(12.5)
+            .mass(11.2 )
             .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.3, 0.1211,0.001701+1))
-            .forwardZeroPowerAcceleration(-60.72825270100406)
-            .lateralZeroPowerAcceleration(-96.6697407470146)
-            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(0, 0, 0, 0))
-            .headingPIDFCoefficients(new PIDFCoefficients(0, 0, 0, 0))
-            .translationalPIDFCoefficients(new PIDFCoefficients(0,0,0,0))
-            .useSecondaryDrivePIDF(false)
-            .useSecondaryHeadingPIDF(false)
-            .useSecondaryTranslationalPIDF(false);
+            .forwardZeroPowerAcceleration(-56.232924651374766)
+            .lateralZeroPowerAcceleration(-93.23257871730974);
 
     public static MecanumConstants mecanumConstants = new MecanumConstants()
             .useBrakeModeInTeleOp(true)
-            .xVelocity(63.31940562330832)
-            .yVelocity(54.23424342432423)
+            .xVelocity(55.04269817682702)
+            .yVelocity(36.01743058332076)
+
 
             .leftFrontMotorName("lF")
             .leftRearMotorName("lR")
@@ -53,10 +48,13 @@ public class Constants {
             .strafePodX(4.9)
             .distanceUnit(DistanceUnit.INCH)
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
+            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.95, 100, 1, 1);
+    public static PathConstraints pathConstraints = new PathConstraints(0.95,
+            100,
+            1,
+            1);
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
