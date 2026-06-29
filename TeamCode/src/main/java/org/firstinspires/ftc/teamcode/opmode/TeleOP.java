@@ -109,22 +109,28 @@ public class TeleOP extends LinearOpMode {
 
             double finalTargetRPM = 0.0;
 
+            double boost = 1.0;
+
             // Boost when intake is running (balls moving through the system)
             boolean shouldBoost = gamepad1.a || gamepad2.a;
 
             // Right bumper = aim and spin up using tuned table
-            if (gamepad1.right_bumper && PoseStorage.isRedAlliance) {
+            if (PoseStorage.isRedAlliance) {
                 if (gamepad1.dpadLeftWasPressed())  offset += 2.0;
                 if (gamepad1.dpadRightWasPressed()) offset -= 2.0;
+                if (gamepad1.dpadUpWasPressed()) boost += 0.1;
+                if (gamepad1.dpadUpWasPressed()) boost -= 0.1;
                 spinSimple.track(Math.toDegrees(Hr2), offset);
-                finalTargetRPM = spinSimple.aimForDistance(distMM_R);
+                finalTargetRPM = spinSimple.aimForDistance(distMM_R) * boost;
                 outtake.setPower(finalTargetRPM, shouldBoost);
 
-            } else if (gamepad1.right_bumper && !PoseStorage.isRedAlliance) {
+            } else if (!PoseStorage.isRedAlliance) {
                 if (gamepad1.dpadLeftWasPressed())  offset += 2.0;
                 if (gamepad1.dpadRightWasPressed()) offset -= 2.0;
+                if (gamepad1.dpadUpWasPressed()) boost += 0.1;
+                if (gamepad1.dpadUpWasPressed()) boost -= 0.1;
                 spinSimple.track(Math.toDegrees(Hb2), offset);
-                finalTargetRPM = spinSimple.aimForDistance(distMM_B);
+                finalTargetRPM = spinSimple.aimForDistance(distMM_B) * boost;
                 outtake.setPower(finalTargetRPM, shouldBoost);
             }
 

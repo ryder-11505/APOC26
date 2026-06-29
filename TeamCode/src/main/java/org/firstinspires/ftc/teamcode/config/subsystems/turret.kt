@@ -15,7 +15,7 @@ class turret(hardwareMap: HardwareMap) {
     @Configurable
     companion object PARAMS {
 
-        @JvmField var ticksPerDegree: Double = 8.79083
+        @JvmField var ticksPerDegree: Double = 8.79083 * 49/45
 
         @JvmField var P = 12.0
         @JvmField var I = 2.0
@@ -26,6 +26,15 @@ class turret(hardwareMap: HardwareMap) {
         @JvmField var turretTrim: Double = 2.0
 
         // Tuned table: (distanceMM, servoPos, shooterRPM)
+//        val HOOD_TABLE = listOf(
+//            Triple(500.0,  1.0000, 1000.0),
+//            Triple(1000.0, 0.9400, 1020.0),
+//            Triple(1500.0, 0.8700, 1200.0),
+//            Triple(2000.0, 0.8000, 1300.0),
+//            Triple(2500.0, 0.7700, 1330.0),
+//            Triple(3000.0, 0.7700, 1430.0),
+//        )
+
         val HOOD_TABLE = listOf(
             Triple(500.0,  1.0000, 940.0),
             Triple(1000.0, 0.9400, 980.0),
