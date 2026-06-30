@@ -93,27 +93,28 @@ public class SixBallBlueGate extends LinearOpMode {
         //
         // Example sequence placeholder — replace with your actual waypoints:
         // ===================================================================
-        double rpm = turret.aimForDistance(1300.0);
+        double rpm = turret.aimForDistance(1000.0);
         shooter.setPower(rpm, false);
         drive(-24, 0, DEFAULT_POWER);
 
         sleep(2000);
 
         turret.track(-6.0, 0.0);
-        sleep(600);
+        sleep(1000);
         shooter.toggleGate();
         intake.intake();
         sleep(400);
         intake.stopIntake();
         sleep(1000);
         intake.intake();
-        sleep(200);
+        sleep(300);
         intake.stopIntake();
         sleep(1000);
         intake.intake();
-        sleep(700);
+        sleep(800);
         intake.stopIntake();
         shooter.toggleGate();
+
 
         turn(110,DEFAULT_POWER);
 
@@ -125,7 +126,7 @@ public class SixBallBlueGate extends LinearOpMode {
 
         drive(24,0,0.3 );
 
-        sleep(500);
+        sleep(200);
 
         intake.stopIntake();
 
@@ -135,21 +136,21 @@ public class SixBallBlueGate extends LinearOpMode {
 
         shooter.setPower(rpm, false);
 
-        drive(35,10,DEFAULT_POWER);
+        drive(33,0,DEFAULT_POWER);
 
         turret.track(70.0, 0.0);
-        sleep(1000);
+        sleep(600);
         shooter.toggleGate();
         intake.intake();
         sleep(400);
         intake.stopIntake();
         sleep(1000);
         intake.intake();
-        sleep(200);
+        sleep(300);
         intake.stopIntake();
         sleep(1000);
         intake.intake();
-        sleep(700);
+        sleep(800);
         intake.stopIntake();
         shooter.toggleGate();
 
@@ -157,13 +158,13 @@ public class SixBallBlueGate extends LinearOpMode {
 
         turn(25,DEFAULT_POWER);
 
-        drive(-35,0,DEFAULT_POWER);
+        drive(-37,0,DEFAULT_POWER);
 
         turn(90,DEFAULT_POWER);
 
-        drive(30,0,DEFAULT_POWER);
+        drive(25,0,DEFAULT_POWER);
 
-        sleep(500);
+        sleep(1000);
 
         drive(-10,0,DEFAULT_POWER);
 

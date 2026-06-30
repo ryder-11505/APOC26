@@ -24,8 +24,8 @@ import org.firstinspires.ftc.teamcode.subsystems.turret;
  *   Wheel diameter: 86 mm = 3.386 in -> circumference = 10.638 in
  *   -> TICKS_PER_INCH ≈ 33.4
  */
-@Autonomous(name = "6 Ball Blue")
-public class SixBallBlue extends LinearOpMode {
+@Autonomous(name = "9 Ball Blue Gate")
+public class NineBallBlueGate extends LinearOpMode {
 
     // ---- SWYFT Drive V2 constants ----
     // NOTE: SWYFT/goBILDA-style motors spec "28 PPR" as the ALREADY-DECODED
@@ -48,7 +48,7 @@ public class SixBallBlue extends LinearOpMode {
     static final double TRACK_WIDTH_IN      = 14.0;  // distance between left/right wheel centers
     static final double WHEEL_BASE_IN       = 14.0;  // distance between front/back wheel centers
 
-    static final double DEFAULT_POWER       = 0.5;
+    static final double DEFAULT_POWER       = 1;
 
     DcMotorEx leftFront, rightFront, leftRear, rightRear;
 
@@ -100,7 +100,7 @@ public class SixBallBlue extends LinearOpMode {
         sleep(2000);
 
         turret.track(-6.0, 0.0);
-        sleep(1000);
+        sleep(500);
         shooter.toggleGate();
         intake.intake();
         sleep(400);
@@ -126,7 +126,7 @@ public class SixBallBlue extends LinearOpMode {
 
         drive(24,0,0.3 );
 
-        sleep(500);
+        sleep(200);
 
         intake.stopIntake();
 
@@ -136,10 +136,10 @@ public class SixBallBlue extends LinearOpMode {
 
         shooter.setPower(rpm, false);
 
-        drive(35,0,DEFAULT_POWER);
+        drive(33,0,DEFAULT_POWER);
 
         turret.track(70.0, 0.0);
-        sleep(600);
+        sleep(400);
         shooter.toggleGate();
         intake.intake();
         sleep(400);
@@ -153,9 +153,47 @@ public class SixBallBlue extends LinearOpMode {
         sleep(800);
         intake.stopIntake();
         shooter.toggleGate();
+
         turret.track(0.1, 0.0);
 
-        drive(-25,0,DEFAULT_POWER);
+        turn(25,DEFAULT_POWER);
+
+        drive(-39,0,DEFAULT_POWER);
+
+        turn(90,DEFAULT_POWER);
+
+        drive(30,0,DEFAULT_POWER);
+
+        sleep(1000);
+
+        drive(-30,0,DEFAULT_POWER);
+
+        //turn(-90,DEFAULT_POWER);
+
+        drive(0,20,DEFAULT_POWER);
+
+        turn(-5,DEFAULT_POWER);
+
+        intake.intake();
+
+        drive(24,0,0.3 );
+
+        sleep(200);
+
+        intake.stopIntake();
+
+        drive(-5,0,DEFAULT_POWER);
+
+        shooter.setPower(rpm, false);
+
+
+
+
+
+
+
+
+
 
 
 
